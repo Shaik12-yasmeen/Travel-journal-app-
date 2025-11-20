@@ -1,0 +1,142 @@
+Components/Login.js: 
+import React, { useState } from 'react'; import API, { setAuthToken } from '../api'; 
+ 
+const Login = ({ setUser }) => {     const [email, setEmail] = useState('');     const [password, setPassword] = useState('');  const handleLogin = async (e) => { 
+        e.preventDefault(); 
+        try {             const { data } = await API.post('/users/login', { email, password });             localStorage.setItem('token', data.token);             setAuthToken(data.token);             setUser(data.user);         } catch (error) {             console.error(error.response.data); 
+        } 
+    }; 
+ 
+    return ( 
+        <form onSubmit={handleLogin}> 
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /> 
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /> 
+            <button type="submit">Login</button> 
+        </form> 
+    ); 
+}; 
+ 
+export default Login; 
+ 
+components/register.js: import React, { useState } from 'react'; import API from '../api'; 
+ 
+const Register = () => { 
+const [username, setUsername] = useState('');  const [email, setEmail] = useState('');     const [password, setPassword] = useState(''); 
+ 
+    const handleRegister = async (e) => { 
+        e.preventDefault(); 
+        try { 
+            await API.post('/users/register', { username, email, password });             alert('Registration successful!'); 
+        } catch (error) {             if (error.response && error.response.data) {                 console.error('Error:', error.response.data);                 alert(error.response.data.message || 'An error occurred during registration.'); 
+            } else {                 console.error('Error:', error.message);                 alert('An error occurred. Please try again later.'); 
+            } 
+        } 
+    }; 
+     
+     
+ 
+    return ( 
+        <form onSubmit={handleRegister}> 
+            <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} /> 
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /> 
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /> 
+            <button type="submit">Register</button> 
+    </form> 
+ ); 
+}; 
+ 
+export default Register; 
+ 
+components/navbar.js: 
+import React from 'react'; import { Link, useNavigate } from 'react-router-dom'; 
+ 
+const Navbar = ({ user, setUser }) => {     const navigate = useNavigate(); 
+ 
+    const handleLogout = () => {         setUser(null);         localStorage.removeItem('token');         navigate('/auth'); 
+    }; 
+ 
+    return ( 
+        <nav> 
+            <Link to="/">Home</Link> 
+            {user ? ( 
+                <> 
+                    <Link to="/journals">My Journals</Link> 
+                    <button onClick={handleLogout}>Logout</button> 
+                </> 
+            ) : ( 
+                <Link to="/auth">Login</Link> 
+            )} 
+        </nav> 
+); 
+};
+ 
+export default Navbar; 
+  
+pages/Homepage: 
+import React from 'react'; 
+ 
+const HomePage = () => <h1>Welcome to the Travel Journal App</h1>; 
+ 
+export default HomePage; 
+ 
+pages/authpage: 
+import React, { useState } from 'react'; import Login from '../components/Login'; import Register from '../components/Register'; 
+ 
+const AuthPage = ({ setUser }) => {     const [isLogin, setIsLogin] = useState(true); 
+ 
+    return ( 
+        <div> 
+            {isLogin ? <Login setUser={setUser} /> : <Register />} 
+            <button onClick={() => setIsLogin(!isLogin)}> 
+                {isLogin ? 'Switch to Register' : 'Switch to Login'} 
+            </button> 
+        </div> 
+    ); 
+}; 
+export default AuthPage; 
+ 
+ 
+ 
+api.js: import axios from 'axios'; 
+ 
+const API = axios.create({     baseURL: 'http://localhost:5000/api', 
+}); 
+ 
+export const setAuthToken = (token) => { 
+    if (token) { 
+        API.defaults.headers.common['Authorization'] = `Bearer ${token}`; 
+    } else {         delete API.defaults.headers.common['Authorization']; 
+    } 
+}; 
+ 
+export default API; 
+ 
+ 
+ 
+App.js 
+ 
+import React, { useState, useEffect } from 'react'; import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; import Navbar from './components/Navbar'; import HomePage from './pages/HomePage'; 
+import JournalsPage from './pages/JournalsPage'; import AuthPage from './pages/AuthPage'; import { setAuthToken } from './api'; 
+ 
+function App() {     const [user, setUser] = useState(null); 
+ 
+    useEffect(() => {         const token = localStorage.getItem('token');         if (token) {             setAuthToken(token);             setUser({}); // Just a placeholder, ideally you'd fetch user details 
+        } 
+    }, []); 
+ 
+    return ( 
+        <Router> 
+            <Navbar user={user} setUser={setUser} /> 
+            <Routes> 
+                <Route path="/" element={<HomePage />} /> 
+                <Route path="/journals" element={user ? <JournalsPage /> : <Navigate to="/auth" />} /> 
+                <Route path="/auth" element={<AuthPage setUser={setUser} />} /> 
+            </Routes> 
+        </Router> 
+    ); 
+} 
+ 
+export default App; 
+Run: 
+    npm start 
+ 

@@ -1,0 +1,14 @@
+•	config/ o db.js 
+o	.env 
+•	controllers/ o userController.js 
+o	journalController.js 
+•	models/ o User.js 
+o	Journal.js 
+•	routes/ o userRoutes.js 
+o	journalRoutes.js 
+•	middleware/ 
+o	authMiddleware.js 
+•	uploads/ (for storing uploaded images) 
+•	server.js 
+ 
+ 

@@ -1,0 +1,13 @@
+•	public/ 
+o	index.html 
+•	src/ 
+o	components/ 
+▪	Login.js 
+▪	Register.js 
+▪	JournalForm.js 
+▪	JournalList.js 
+▪	ProtectedRoute.js 
+o	context/ 
+▪	AuthContext.js o api.js 
+o	App.js 
+o	index.js 
